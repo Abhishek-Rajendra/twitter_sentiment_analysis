@@ -1,0 +1,10 @@
+numpy
+pandas
+wheel
+matplotlib
+tweepy
+kafka-python
+textblob
+elasticsearch
+sklearn
+sentence-transformers
