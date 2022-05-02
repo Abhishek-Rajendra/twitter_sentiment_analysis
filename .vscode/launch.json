@@ -5,10 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "Scrapper",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "scrapper.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Sentiment",
+            "type": "python",
+            "request": "launch",
+            "program": "sentimental.py",
             "console": "integratedTerminal",
             "justMyCode": false
         }

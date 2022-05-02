@@ -5,15 +5,16 @@ from kafka import KafkaProducer, KafkaConsumer
 from kafka.admin import KafkaAdminClient, NewTopic
 from kafka.errors import TopicAlreadyExistsError, UnknownTopicOrPartitionError
 from config import *
+import json
 
 
 # To perform admin operation like create and delete topics
-admin_client = KafkaAdminClient(bootstrap_servers=[ip_address])
+admin_client = KafkaAdminClient(bootstrap_servers=[kafka_url])
 
 # Create new topics from list
 def create_topics(topic_names):
     consumer = KafkaConsumer(
-    bootstrap_servers = ip_address,
+    bootstrap_servers = kafka_url,
     )
     existing_topic_list = consumer.topics()
     print(list(consumer.topics()))
@@ -55,8 +56,19 @@ class KafkaPushListener(StreamingClient):
     def on_data(self, data):
         # Producer produces data for consumer
         # Data comes from Twitter Streaming API
-        self.producer.send(topic_name, data)
-        print(data)
+        data = json.loads(data.decode()) 
+        data = data["data"]
+        
+        # Extra Filtering if hashtag is not present sometimes
+        if "hashtags" in data["entities"]:
+            
+            for hashtags in data["entities"]["hashtags"]:
+                tag = hashtags["tag"]
+                if tag == hashtag:
+                    print([tag["tag"] for tag in data["entities"]["hashtags"]])
+                    final = data["text"]
+                    self.producer.send(topic_name, key = tag.encode('utf-8'), value = final.encode('utf-8'))
+
         return True
 
     def on_error(self, status):
@@ -70,12 +82,23 @@ if __name__ == "__main__":
     streaming_client = KafkaPushListener(bearer_token)
     create_topics(topic_names)
 
+    previous_rules = streaming_client.get_rules().data
+    # Print exiting rules applied on to the Twitter API - For filtering thr streaming data
+    print("Previous rules: ", previous_rules)
+
+    previous_filter_ids = [rule.id for rule in previous_rules]
+
+    # Uncomment and update id values to delete rules based on ids
+    streaming_client.delete_rules(ids=previous_filter_ids)
+
+    print("Previous rules deleted")
+
+
+    # Adding rule to filter streaming data from twitter API
     streaming_client.add_rules(StreamRule(value=filter_hashtag))
 
-    # Print exiting rules applied on to the Twitter API - For filtering thr streaming data
-    print(streaming_client.get_rules())
+    # Present Rule
+    print(streaming_client.get_rules().data)   
 
-    # Uncomment and update id vales to delete rules based in ids
-    # streaming_client.delete_rules(ids=["1518016285157867520","1518857090021928960"])
 
     streaming_client.filter( tweet_fields=["text","created_at","entities"])

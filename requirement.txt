@@ -2,9 +2,11 @@ numpy
 pandas
 wheel
 matplotlib
+pyspark==2.4.0
 tweepy
 kafka-python
 textblob
 elasticsearch
 sklearn
 sentence-transformers
+

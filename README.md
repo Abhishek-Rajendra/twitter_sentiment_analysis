@@ -1,7 +1,8 @@
-<<<<<<< HEAD
-zookeeper-server-start /home/linuxbrew/.linuxbrew/etc/kafka/zookeeper.properties
+# twitter_sentiment_analysis
 
-kafka-server-start /home/linuxbrew/.linuxbrew/etc/kafka/server.properties
+Documents/apps/kafka/bin/zookeeper-server-start.sh ./Documents/apps/kafka/config/zookeeper.properties
+
+Documents/apps/kafka/bin/kafka-server-start.sh ./Documents/apps/kafka/server.properties
 
 bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --topic basic
 
@@ -20,6 +21,4 @@ http://localhost:5601/app/home
 curl --cacert /etc/elasticsearch/certs/http_ca.crt -u elastic:y31tB4rL8+YdxZWOsSR0 https://localhost:9200 
 
 curl -X POST "https://api.twitter.com/2/tweets/search/stream/rules" -H "Authorization: Bearer AAAAAAAAAAAAAAAAAAAAAK1ybgEAAAAAJ18tuG7POzsOYYXvN85EgbR%2FTHA%3DnZVppVqUrg2KqJaoujDUa3q0WHJdvyAv72lTRfcv2u78D9JcsP" -H "Content-type: application/json" -d '{"add":[{"value":"#kgf2"}]}'
-=======
-# twitter_sentiment_analysis
->>>>>>> 7697e781de1ee5e577496fbc048441972b11b37f
+

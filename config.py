@@ -7,11 +7,12 @@ topic_names = [topic_name]
 elastic_url = "https://localhost:9200"
 user = "elastic"
 password = "y31tB4rL8+YdxZWOsSR0"
-index = "tweet"
+index = "tweet_sentimental_analysis"
 indices = [index]
 
 # Tweeter API
-filter_hashtag = "#KGFChapter2"
+hashtag = "sundayvibes"
+filter_hashtag = "#" + hashtag
 
 """API ACCESS KEYS"""
 
