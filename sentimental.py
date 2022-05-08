@@ -2,6 +2,7 @@
 References: 
 '''
 import json
+import shutil
 from textblob import TextBlob
 from elasticsearch import Elasticsearch
 from config import *
@@ -12,7 +13,7 @@ from pyspark.sql import functions as F
 import os
 
 # Import 3rd party packages
-os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.elasticsearch:elasticsearch-spark-20_2.11:8.1.3,org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.7 pyspark-shell'
+# os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.elasticsearch:elasticsearch-spark-20_2.11:8.1.3,org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.7 pyspark-shell'
 
 def delete_index_data(es, indices):
     es.delete_by_query(index=indices, body={"query": {"match_all": {}}})
@@ -29,7 +30,7 @@ def connect_elasticsearch():
     return _es
 
 def preprocessing(lines):
-    words = lines.select(lines.key.alias("Hashtag"), lines.value.alias("word"))
+    words = lines.select(lines.key.alias("Hashtag"), lines.value.alias("word"), lines.timestamp.alias("timestamp"))
     words = words.na.replace('', None)
     words = words.na.drop()
     words = words.withColumn('word', F.regexp_replace('word', r'http\S+', ''))
@@ -68,18 +69,17 @@ def text_classification(words):
 
 if __name__ == "__main__":
 
-    # consumer = KafkaConsumer(
-    #     topic_name,
-    #     bootstrap_servers = kafka_url,
-    #     value_deserializer = lambda v: json.loads(v.decode("utf-8")),
-    #     auto_offset_reset='earliest'
-    # )
-
-    # struct = StructType()
+    if not use_checkpoint:
+        try: 
+            if os.path.isdir(checkpoint_sentiment):
+                shutil.rmtree(checkpoint_sentiment)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (checkpoint_sentiment, e))
 
     spark = SparkSession.builder\
     .master("local[*]")\
     .appName("Sentimental.analysis")\
+    .config('spark.jars.packages', 'org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.7,org.elasticsearch:elasticsearch-spark-20_2.11:8.1.3')\
     .getOrCreate()
     
     lines = spark \
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     .format("kafka") \
     .option("kafka.bootstrap.servers", kafka_url) \
     .option("subscribe", topic_name) \
-    .load().selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)") \
+    .load().selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)", "CAST(timestamp AS STRING)") \
 
     
     # with open("temp/temp.json") as fp:
@@ -110,24 +110,24 @@ if __name__ == "__main__":
     #     .trigger(processingTime='60 seconds').start()
     # query.awaitTermination()
     
-    # query = words.writeStream \
-    # .outputMode("append") \
-    # .queryName("writing_to_es") \
-    # .format("org.elasticsearch.spark.sql") \
-    # .option("es.nodes.wan.only", "true") \
-    # .option("es.net.ssl", "false") \
-    # .option("checkpointLocation", "/tmp/") \
-    # .option("es.resource", "tweet_sentiment") \
-    # .option("es.nodes", "localhost") \
-    # .option("es.port", "9200")\
-    # .start()
-
-    # query.awaitTermination()
-
-    words.writeStream \
+    query = words.writeStream \
     .outputMode("append") \
-    .format("console") \
-    .start().awaitTermination()
+    .queryName("writing_to_es") \
+    .format("org.elasticsearch.spark.sql") \
+    .option("es.nodes.wan.only", "true") \
+    .option("es.net.ssl", "false") \
+    .option("checkpointLocation", checkpoint_sentiment) \
+    .option("es.resource", index) \
+    .option("es.nodes", host) \
+    .option("es.port", port)\
+    .start()
+
+    query.awaitTermination()
+
+    # words.writeStream \
+    # .outputMode("append") \
+    # .format("console") \
+    # .start().awaitTermination()
 
     # es = connect_elasticsearch()
 

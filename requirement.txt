@@ -9,4 +9,5 @@ textblob
 elasticsearch
 sklearn
 sentence-transformers
+seaborn
 

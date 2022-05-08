@@ -10,6 +10,8 @@ import json
 
 # To perform admin operation like create and delete topics
 admin_client = KafkaAdminClient(bootstrap_servers=[kafka_url])
+input_hashtags = [x.lower() for x in hashtags]
+
 
 # Create new topics from list
 def create_topics(topic_names):
@@ -63,10 +65,10 @@ class KafkaPushListener(StreamingClient):
         if "hashtags" in data["entities"]:
             
             for hashtags in data["entities"]["hashtags"]:
-                tag = hashtags["tag"]
-                if tag == hashtag:
-                    print([tag["tag"] for tag in data["entities"]["hashtags"]])
+                tag = hashtags["tag"].lower()
+                if tag in input_hashtags:  
                     final = data["text"]
+                    print([x["tag"] for x in data["entities"]["hashtags"]])
                     self.producer.send(topic_name, key = tag.encode('utf-8'), value = final.encode('utf-8'))
 
         return True
@@ -95,10 +97,12 @@ if __name__ == "__main__":
 
 
     # Adding rule to filter streaming data from twitter API
-    streaming_client.add_rules(StreamRule(value=filter_hashtag))
+    for filter_hashtag in hashtags:
+        filter_hashtag = "#" + filter_hashtag
+        streaming_client.add_rules(StreamRule(value=filter_hashtag))
 
     # Present Rule
-    print(streaming_client.get_rules().data)   
+    print("Updated rules: ",streaming_client.get_rules().data)   
 
 
     streaming_client.filter( tweet_fields=["text","created_at","entities"])

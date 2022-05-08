@@ -5,14 +5,20 @@ topic_names = [topic_name]
 
 # Elasticsearch properties
 elastic_url = "https://localhost:9200"
+host = "localhost"
+port = 9200
 user = "elastic"
 password = "y31tB4rL8+YdxZWOsSR0"
 index = "tweet_sentimental_analysis"
 indices = [index]
 
+# Checkpoints
+use_checkpoint = False
+checkpoint_sentiment = "checkpoint/sentiment"
+checkpoint_clustering = "checkpoint/clustering"
+
 # Tweeter API
-hashtag = "sundayvibes"
-filter_hashtag = "#" + hashtag
+hashtags = ["doctorstrangeinthemultiverseofmadness"]
 
 """API ACCESS KEYS"""
 
