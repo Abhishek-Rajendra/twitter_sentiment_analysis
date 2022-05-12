@@ -21,7 +21,3 @@ To run clustering please add only one hashtag in the hastag list(check config fi
 
 
 Happy Streaming !!
-
-# Recommendation Systems
-
-Ran for different ranks to obtain the best rank possible, obtained good results for lambda = 0.1, check the output file for the results.
