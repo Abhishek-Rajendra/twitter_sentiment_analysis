@@ -68,8 +68,14 @@ class KafkaPushListener(StreamingClient):
                 tag = hashtags["tag"].lower()
                 if tag in input_hashtags:  
                     final = data["text"]
+                    document = {
+                    "text": final,
+                    "timestamp": data["created_at"]
+                    }
+                    document = json.dumps(document)
+                    print(document)
                     print([x["tag"] for x in data["entities"]["hashtags"]])
-                    self.producer.send(topic_name, key = tag.encode('utf-8'), value = final.encode('utf-8'))
+                    self.producer.send(topic_name, key = tag.encode('utf-8'), value = document.encode('utf-8'))
 
         return True
 

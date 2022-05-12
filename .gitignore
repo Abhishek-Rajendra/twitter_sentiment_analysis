@@ -1,5 +1,5 @@
 # extra folders
-checkpoints/
+*checkpoint/
 temp/
 plots/
 .vscode/launch.json

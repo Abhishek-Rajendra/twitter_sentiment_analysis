@@ -18,7 +18,10 @@ checkpoint_sentiment = "checkpoint/sentiment"
 checkpoint_clustering = "checkpoint/clustering"
 
 # Tweeter API
-hashtags = ["doctorstrangeinthemultiverseofmadness"]
+
+# Include only one hashtag for clustering code
+
+hashtags = ["doctorstrangeinthemultiverseofmadness", "RRR", "kgf"]
 
 """API ACCESS KEYS"""
 

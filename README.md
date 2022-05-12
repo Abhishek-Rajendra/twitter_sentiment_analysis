@@ -1,24 +1,27 @@
-# twitter_sentiment_analysis
+# Twitter_Sentiment_Analysis
 
-Documents/apps/kafka/bin/zookeeper-server-start.sh ./Documents/apps/kafka/config/zookeeper.properties
+By Abhishek Rajendra Prasad
 
-Documents/apps/kafka/bin/kafka-server-start.sh ./Documents/apps/kafka/server.properties
+Run the kakfa server and zookeeper server before running the scrapper code. 
 
-bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --topic basic
+Also make sure you have disabled the elasticsearch security in elasticsearch.yml
 
-kafka-console-producer --bootstrap-server localhost:9092 --topic basic
-
-kafka-console-consumer --from-beginning --bootstrap-server localhost:9092 --topic basic
+Go to config file to set up hashtags and other configiration to run the services.
 
 
-sudo systemctl enable elasticsearch
+## Sentimental Analysis
 
-sudo systemctl enable kibana
-
-http://localhost:5601/app/home
+It supports multiple hastags at once for sentimental analysis. Check config file
 
 
-curl --cacert /etc/elasticsearch/certs/http_ca.crt -u elastic:y31tB4rL8+YdxZWOsSR0 https://localhost:9200 
 
-curl -X POST "https://api.twitter.com/2/tweets/search/stream/rules" -H "Authorization: Bearer AAAAAAAAAAAAAAAAAAAAAK1ybgEAAAAAJ18tuG7POzsOYYXvN85EgbR%2FTHA%3DnZVppVqUrg2KqJaoujDUa3q0WHJdvyAv72lTRfcv2u78D9JcsP" -H "Content-type: application/json" -d '{"add":[{"value":"#kgf2"}]}'
+## Clustering
+To run clustering please add only one hashtag in the hastag list(check config file) or else the tweeter API will get all the tweets for all the hashtags. 
 
+
+
+Happy Streaming !!
+
+# Recommendation Systems
+
+Ran for different ranks to obtain the best rank possible, obtained good results for lambda = 0.1, check the output file for the results.
